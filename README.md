@@ -1,4 +1,4 @@
-# 🌤 Weather Dashboard
+# Weather Dashboard
 
 A responsive weather application that displays current conditions and a 3-day forecast using the OpenWeatherMap API.
 
