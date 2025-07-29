@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="text-center py-5">
+            <h1 class="display-4 fw-bold">🌤 Weather Dashboard</h1>
+            <p class="fs-5">Check current weather & 3-day forecast</p>
+        </header>
+
+        <!-- Search Section -->
+        <div class="card weather-card mb-5">
+            <div class="card-body p-4">
+                <form id="searchForm" class="d-flex flex-column flex-sm-row gap-3 max-w-md mx-auto">
+                    <div class="position-relative flex-grow-1">
+                        <i class="fas fa-map-marker-alt position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+                        <input type="text" id="cityInput" class="form-control search-input py-3 ps-5" placeholder="Enter city name..." required>
+                    </div>
+                    <button type="submit" class="btn btn-primary search-btn py-3 px-4">
+                        <i class="fas fa-search me-2"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Current Weather Card -->
+        <div class="card weather-card current-weather mb-5">
+            <div class="card-body p-4">
+                <div class="row g-4 align-items-center">
+                    <!-- Left side - Main weather info -->
+                    <div class="col-md-6 text-center text-md-start">
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-4">
+                            <h2 id="cityName" class="h2 fw-bold">{{ weather.city }}</h2>
+                            <span id="countryCode" class="fs-5">{{ weather.country }}</span>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-4 mb-6">
+                            <div class="weather-icon">
+                                <i id="weatherIcon" class="fas fa-sun"></i>
+                            </div>
+                            <div>
+                                <div class="display-4 fw-bold mb-2">
+                                    <span id="temperature">{{ weather.temp }}</span>°C
+                                </div>
+                                <p id="weatherDescription" class="fs-4">{{ weather.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right side - Weather details -->
+                    <div class="col-md-6">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="p-3 detail-card feels-like">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-temperature-high"></i>
+                                        <span class="small fw-medium">Feels like</span>
+                                    </div>
+                                    <p class="fs-3 fw-bold">
+                                        <span id="feelsLike">{{ weather.feels_like }}</span>°C
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 detail-card humidity">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-tint"></i>
+                                        <span class="small fw-medium">Humidity</span>
+                                    </div>
+                                    <p class="fs-3 fw-bold">
+                                        <span id="humidity">{{ weather.humidity }}</span>%
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 detail-card wind">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-wind"></i>
+                                        <span class="small fw-medium">Wind</span>
+                                    </div>
+                                    <p class="fs-3 fw-bold">
+                                        <span id="windSpeed">{{ weather.wind_speed }}</span> km/h
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 detail-card pressure">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-tachometer-alt"></i>
+                                        <span class="small fw-medium">Pressure</span>
+                                    </div>
+                                    <p class="fs-3 fw-bold">
+                                        <span id="pressure">{{ weather.pressure }}</span> hPa
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3-Day Forecast -->
+        <div class="forecast-section">
+            <h3 class="text-center fw-bold mb-4">3-Day Forecast</h3>
+            <div class="row g-4" id="forecastContainer">
+                {% for day in weather.forecast %}
+                <div class="col-md-4">
+                    <div class="card forecast-card">
+                        <div class="card-body p-4 text-center">
+                            <h4 class="h4 fw-bold mb-4">{{ day.day }}</h4>
+                            <div class="mb-4">
+                                <i class="fas fa-{{ day.icon }} forecast-icon"></i>
+                            </div>
+                            <div class="forecast-temps">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small fw-medium">Max</span>
+                                    <span class="fs-3 fw-bold">{{ day.max_temp }}°</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small fw-medium">Min</span>
+                                    <span class="fs-4 fw-semibold">{{ day.min_temp }}°</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 py-4 text-center">
+            <p class="fw-medium">Powered by OpenWeatherMap</p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const city = document.getElementById('cityInput').value.trim();
+            
+            if (!city) return;
+            
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `city=${encodeURIComponent(city)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                // Update current weather
+                document.getElementById('cityName').textContent = data.city;
+                document.getElementById('countryCode').textContent = data.country;
+                document.getElementById('temperature').textContent = data.temp;
+                document.getElementById('weatherDescription').textContent = data.description;
+                document.getElementById('feelsLike').textContent = data.feels_like;
+                document.getElementById('humidity').textContent = data.humidity;
+                document.getElementById('windSpeed').textContent = data.wind_speed;
+                document.getElementById('pressure').textContent = data.pressure;
+                
+                // Update weather icon
+                const weatherIcon = document.getElementById('weatherIcon');
+                weatherIcon.className = `fas fa-${data.icon}`;
+                
+                // Update forecast
+                const forecastContainer = document.getElementById('forecastContainer');
+                forecastContainer.innerHTML = '';
+                
+                data.forecast.forEach(day => {
+                    forecastContainer.innerHTML += `
+                        <div class="col-md-4">
+                            <div class="card forecast-card">
+                                <div class="card-body p-4 text-center">
+                                    <h4 class="h4 fw-bold mb-4">${day.day}</h4>
+                                    <div class="mb-4">
+                                        <i class="fas fa-${day.icon} forecast-icon"></i>
+                                    </div>
+                                    <div class="forecast-temps">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-medium">Max</span>
+                                            <span class="fs-3 fw-bold">${day.max_temp}°</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-medium">Min</span>
+                                            <span class="fs-4 fw-semibold">${day.min_temp}°</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while fetching weather data');
+            });
+        });
+    </script>
+</body>
+</html>
